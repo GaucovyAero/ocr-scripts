@@ -7,4 +7,4 @@ Written in Bash. Using them requires a screenshooter (uses `scrot` by default), 
 
 `ocr-file` takes 2 arguments - the language and the file path.
 
-`.desktop files some language shortcuts are included in the `extra` directory of this repository
+`.desktop` files some language shortcuts are included in the `extra` directory of this repository
