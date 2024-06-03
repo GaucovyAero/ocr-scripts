@@ -1,0 +1,2 @@
+#!/bin/sh
+ocr-file eng $1

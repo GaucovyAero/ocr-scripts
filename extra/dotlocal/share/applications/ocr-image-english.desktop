@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=OCR Screenshot (English)
+Comment=Recognizes text from an image an copies it into your clipboard.
+Exec=ocr-image-english
+Icon=gconf-editor
+Categories=Office;
+Terminal=false
+StartupNotify=false

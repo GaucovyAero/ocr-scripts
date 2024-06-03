@@ -1,0 +1,2 @@
+#!/bin/sh
+ocr-file hun $1

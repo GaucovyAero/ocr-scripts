@@ -1,0 +1,2 @@
+#!/bin/sh
+ocr-image deu $1
