@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Define variables used in this script
+export OCR_SCREENSHOT_PATH=/tmp/ocr-image.png
+export OCR_OUTPUT_TEXT_PATH=/tmp/ocr-output
+export OCR_SCREENSHOOTER="scrot"
+export OCR_SCREENSHOOTER_ARGS="-s --freeze --overwrite $OCR_SCREENSHOT_PATH"
+export OCR_LANGUAGE=$1
+export TESSERACT_ARGS="$OCR_SCREENSHOT_PATH $OCR_OUTPUT_TEXT_PATH -l $OCR_LANGUAGE"
+
+# Check if the language has been determined and if it is the correct length.
+[ -z $OCR_LANGUAGE ] && echo -e "\$OCR_LANGUAGE has not been determined. Exiting.\n" && exit 0 
+[ ! "${#OCR_LANGUAGE}" == 3 ] && echo -e "\$OCR_LANGUAGE must be 3 letters long. Exiting.\n" && exit 0
+
+# Check if the dependencies are installed
+[ -z $(type -P tesseract) ] && echo "tesseract is not installed"
+[ -z $(type -P $OCR_SCREENSHOOTER) ] && echo "$OCR_SCREENSHOOTER is not installed"
+[ -z $(type -P xclip) ] && echo "xclip is not installed"
+[ -z $(type -P tesseract) ] || [ -z $(type -P $OCR_SCREENSHOOTER) ] || [ -z $(type -P xclip) ] && echo "Please install the required dependencies." && exit 0
+
+# Execute the screenshooter
+bash -c "$OCR_SCREENSHOOTER $OCR_SCREENSHOOTER_ARGS"
+
+# Recognize text
+echo "Recognizing text..."
+tesseract $TESSERACT_ARGS 
+echo "Text was recognized from the image."
+
+# Copy the text to clipboard (Workaround: tesseract always appends .txt to files)
+export OCR_OUTPUT_TEXT_PATH=$OCR_OUTPUT_TEXT_PATH.txt
+xclip -selection c < "$OCR_OUTPUT_TEXT_PATH"
+echo "Recognized text was copied into clipboard."
+#notify-send "Recognized text was copied into clipboard."
+
+# (Cleanup) Check if the path variables exist
+[ -z "$OCR_SCREENSHOT_PATH" ] && echo -e "$OCR_SCREENSHOT_PATH is null, exiting." && exit 0
+[ -z "$OCR_OUTPUT_TEXT_PATH" ] && echo -e "$OCR_OUTPUT_TEXT_PATH is null, exiting." && exit 0
+
+# (Cleanup) Check if the residual files exist
+[ -f $OCR_SCREENSHOT_PATH ] && rm $OCR_SCREENSHOT_PATH || echo -e "File $OCR_SCREENSHOT_PATH does not exist."
+[ -f $OCR_OUTPUT_TEXT_PATH ] && rm $OCR_OUTPUT_TEXT_PATH || echo -e "File $OCR_OUTPUT_TEXT_PATH does not exist."
+
+# (Cleanup) Check if the residual files were successfully removed
+[ ! -f $OCR_SCREENSHOT_PATH ] && [ ! -f $OCR_OUTPUT_TEXT_PATH ] && echo -e "Successfully cleaned residual files.\n" || echo -e "Cleaning residual files was not successful.\n"
+
+unset OCR_SCREENSHOT_PATH
+unset OCR_OUTPUT_TEXT_PATH
